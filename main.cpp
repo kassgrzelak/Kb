@@ -1,7 +1,9 @@
-#include <iostream>
+#include "Chunk.hpp"
+#include "common.hpp"
 
-int main()
+int main(int argc, const char* argv[])
 {
-	std::cout << "Hello, World!" << std::endl;
+	Chunk chunk;
+
 	return 0;
 }
