@@ -5,6 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_library(kflat_lib
         Chunk.cpp
+        Chunk.hpp
+        debug.cpp
+        debug.hpp
+        Value.cpp
+        Value.hpp
 )
 
 target_include_directories(kflat_lib PUBLIC
@@ -13,7 +18,6 @@ target_include_directories(kflat_lib PUBLIC
 
 add_executable(kflat
         main.cpp
-        Chunk.cpp
 )
 
 target_link_libraries(kflat PRIVATE kflat_lib)
