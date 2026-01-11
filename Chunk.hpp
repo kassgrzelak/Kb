@@ -22,18 +22,18 @@ struct Chunk
 	std::vector<Value> constants;
 
 	[[nodiscard]] size_t size() const noexcept;
-	[[nodiscard]] int getLine(int byteIndex) const;
+	[[nodiscard]] size_t getLine(size_t byteIndex) const;
 
-	void write(OpCode op, int line) noexcept;
-	void write(uint8_t byte, int line) noexcept;
+	void write(OpCode op, size_t line) noexcept;
+	void write(uint8_t byte, size_t line) noexcept;
 
 	size_t addConstant(Value value) noexcept;
 
 private:
 	// Run length encoded (line_num, num_bytes).
-	std::vector<int> lineData;
+	std::vector<size_t> lineData;
 
-	void addLineData(int line) noexcept;
+	void addLineData(size_t line) noexcept;
 };
 
 #endif //KFLAT_CHUNK_HPP

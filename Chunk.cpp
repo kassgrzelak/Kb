@@ -9,28 +9,26 @@ size_t Chunk::size() const noexcept
 	return code.size();
 }
 
-int Chunk::getLine(int byteIndex) const
+size_t Chunk::getLine(size_t byteIndex) const
 {
-	int line = lineData[0];
-
-	for (int i = 1; i < lineData.size(); i += 2)
+	for (size_t i = 1; i < lineData.size(); i += 2)
 	{
-		byteIndex -= lineData[i];
-
-		if (byteIndex < 0)
+		if (lineData[i] > byteIndex)
 			return lineData[i - 1];
+
+		byteIndex -= lineData[i];
 	}
 
 	return -1;
 }
 
-void Chunk::write(const OpCode op, const int line) noexcept
+void Chunk::write(const OpCode op, const size_t line) noexcept
 {
 	code.push_back(op);
 	addLineData(line);
 }
 
-void Chunk::write(const uint8_t byte, const int line) noexcept
+void Chunk::write(const uint8_t byte, const size_t line) noexcept
 {
 	code.push_back(byte);
 	addLineData(line);
@@ -42,7 +40,7 @@ size_t Chunk::addConstant(const Value value) noexcept
 	return constants.size() - 1;
 }
 
-void Chunk::addLineData(const int line) noexcept
+void Chunk::addLineData(const size_t line) noexcept
 {
 	if (lineData.empty())
 	{
