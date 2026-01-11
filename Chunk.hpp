@@ -23,7 +23,9 @@ struct Chunk
 	std::vector<Value> constants;
 
 	[[nodiscard]] size_t size() const noexcept;
+	[[nodiscard]] const uint8_t* getCodePointer() const noexcept;
 	[[nodiscard]] size_t getLine(size_t byteIndex) const;
+	[[nodiscard]] Value getConstant(size_t constantIndex) const noexcept;
 
 	void write(OpCode op, size_t line) noexcept;
 	void write(uint8_t byte, size_t line) noexcept;

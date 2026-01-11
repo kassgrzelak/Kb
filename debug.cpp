@@ -13,17 +13,17 @@ void disassembleChunk(const Chunk &chunk, const char *name)
 {
 	printf("=== %s ===\n", name);
 
-	for (int offset = 0; offset < chunk.size();)
+	for (size_t offset = 0; offset < chunk.size();)
 		offset = disassembleInstruction(chunk, offset);
 }
 
-static int simpleInstruction(const char* name, const int offset)
+static size_t simpleInstruction(const char* name, const size_t offset)
 {
 	printf("%s\n", name);
 	return offset + 1;
 }
 
-static int constantInstruction(const char* name, const Chunk& chunk, const int offset)
+static size_t constantInstruction(const char* name, const Chunk& chunk, const size_t offset)
 {
 	const uint8_t constantIndex = chunk.code[offset + 1];
 
@@ -34,7 +34,7 @@ static int constantInstruction(const char* name, const Chunk& chunk, const int o
 	return offset + 2;
 }
 
-static int constantInstruction24(const char* name, const Chunk& chunk, const int offset)
+static size_t constantInstruction24(const char* name, const Chunk& chunk, const size_t offset)
 {
 	const uint8_t byte1 = chunk.code[offset + 1];
 	const uint8_t byte2 = chunk.code[offset + 2];
@@ -49,9 +49,9 @@ static int constantInstruction24(const char* name, const Chunk& chunk, const int
 	return offset + 4;
 }
 
-int disassembleInstruction(const Chunk &chunk, const int offset)
+size_t disassembleInstruction(const Chunk &chunk, const size_t offset)
 {
-	printf("0x%04x ", offset);
+	printf("0x%04x ", static_cast<unsigned int>(offset));
 
 	if (offset > 0 && chunk.getLine(offset) == chunk.getLine(offset - 1))
 		printf("   | ");

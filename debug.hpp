@@ -7,6 +7,6 @@
 #include "Chunk.hpp"
 
 void disassembleChunk(const Chunk& chunk, const char* name);
-int disassembleInstruction(const Chunk& chunk, int offset);
+size_t disassembleInstruction(const Chunk& chunk, size_t offset);
 
 #endif //KFLAT_DEBUG_HPP

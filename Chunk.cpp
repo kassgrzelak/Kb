@@ -9,6 +9,11 @@ size_t Chunk::size() const noexcept
 	return code.size();
 }
 
+const uint8_t* Chunk::getCodePointer() const noexcept
+{
+	return code.data();
+}
+
 size_t Chunk::getLine(size_t byteIndex) const
 {
 	for (size_t i = 1; i < lineData.size(); i += 2)
@@ -20,6 +25,11 @@ size_t Chunk::getLine(size_t byteIndex) const
 	}
 
 	return -1;
+}
+
+Value Chunk::getConstant(const size_t constantIndex) const noexcept
+{
+	return constants[constantIndex];
 }
 
 void Chunk::write(const OpCode op, const size_t line) noexcept

@@ -10,6 +10,8 @@ add_library(kflat_lib
         debug.hpp
         Value.cpp
         Value.hpp
+        VM.cpp
+        VM.hpp
 )
 
 target_include_directories(kflat_lib PUBLIC
