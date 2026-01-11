@@ -12,7 +12,8 @@
 
 enum OpCode : uint8_t
 {
-	OP_CONSTANT,
+	OP_CONSTANT, OP_CONSTANT_24,
+
 	OP_RETURN
 };
 
@@ -26,6 +27,7 @@ struct Chunk
 
 	void write(OpCode op, size_t line) noexcept;
 	void write(uint8_t byte, size_t line) noexcept;
+	void writeConstant(Value value, size_t line) noexcept;
 
 	size_t addConstant(Value value) noexcept;
 

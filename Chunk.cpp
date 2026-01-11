@@ -34,6 +34,33 @@ void Chunk::write(const uint8_t byte, const size_t line) noexcept
 	addLineData(line);
 }
 
+void Chunk::writeConstant(const Value value, const size_t line) noexcept
+{
+	const size_t constantIndex = addConstant(value);
+
+	if (constantIndex <= UINT8_MAX)
+	{
+		write(OP_CONSTANT, line);
+		write(static_cast<uint8_t>(constantIndex), line);
+	}
+	else if (constantIndex <= 0xffffff)
+	{
+		write(OP_CONSTANT_24, line);
+
+		const uint8_t byte1 = constantIndex >> 16;
+		const uint8_t byte2 = constantIndex >> 8;
+		const uint8_t byte3 = constantIndex;
+
+		write(byte1, line);
+		write(byte2, line);
+		write(byte3, line);
+	}
+	else
+	{
+		// TODO: Error when exceeding the 24 bit constant index limit (somehow).
+	}
+}
+
 size_t Chunk::addConstant(const Value value) noexcept
 {
 	constants.push_back(value);
