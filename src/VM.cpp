@@ -2,13 +2,13 @@
 // Created by kassie on 11/01/2026.
 //
 
-#include "VM.hpp"
+#include "../include/VM.hpp"
 
 #include <complex>
 #include <cstdio>
 
-#include "debug.hpp"
 #include "compiler.hpp"
+#include "debug.hpp"
 
 VM::VM() noexcept
 {

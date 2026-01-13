@@ -3,7 +3,7 @@
 #include <fstream>
 #include <limits>
 
-#include "VM.hpp"
+#include "../include/VM.hpp"
 
 static void repl(VM& vm)
 {
@@ -66,9 +66,9 @@ int main(const int argc, const char* argv[])
 	VM vm{};
 
 	if (argc == 1)
-		repl();
+		repl(vm);
 	else if (argc == 2)
-		runFile(argv[1]);
+		runFile(vm, argv[1]);
 	else
 	{
 		fprintf(stderr, "Usage: kflat [path]\n");

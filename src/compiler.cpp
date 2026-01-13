@@ -2,11 +2,11 @@
 // Created by kassie on 13/01/2026.
 //
 
-#include "compiler.hpp"
+#include "../include/compiler.hpp"
 
 #include <cstdio>
 
-#include "scanner.hpp"
+#include "../include/scanner.hpp"
 
 void compile(VM& vm, const char* source)
 {

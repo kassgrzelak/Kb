@@ -4,26 +4,26 @@ project(kflat)
 set(CMAKE_CXX_STANDARD 20)
 
 add_library(kflat_lib
-        Chunk.cpp
-        Chunk.hpp
-        debug.cpp
-        debug.hpp
-        Value.cpp
-        Value.hpp
-        VM.cpp
-        VM.hpp
-        compiler.cpp
-        compiler.hpp
-        scanner.cpp
-        scanner.hpp
+        src/Chunk.cpp
+        include/Chunk.hpp
+        src/debug.cpp
+        include/debug.hpp
+        src/Value.cpp
+        include/Value.hpp
+        src/VM.cpp
+        include/VM.hpp
+        src/compiler.cpp
+        include/compiler.hpp
+        src/scanner.cpp
+        include/scanner.hpp
 )
 
 target_include_directories(kflat_lib PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 add_executable(kflat
-        main.cpp
+        src/main.cpp
 )
 
 target_link_libraries(kflat PRIVATE kflat_lib)

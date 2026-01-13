@@ -2,7 +2,7 @@
 // Created by kassie on 09/01/2026.
 //
 
-#include "Chunk.hpp"
+#include "../include/Chunk.hpp"
 
 size_t Chunk::size() const noexcept
 {
