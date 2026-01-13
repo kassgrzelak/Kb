@@ -19,7 +19,7 @@ class VM
 public:
 	VM() noexcept;
 
-	InterpretResult interpret(const Chunk* chunk);
+	InterpretResult interpret(const char* source);
 
 private:
 	const Chunk* chunk = nullptr;

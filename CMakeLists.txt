@@ -12,6 +12,10 @@ add_library(kflat_lib
         Value.hpp
         VM.cpp
         VM.hpp
+        compiler.cpp
+        compiler.hpp
+        scanner.cpp
+        scanner.hpp
 )
 
 target_include_directories(kflat_lib PUBLIC

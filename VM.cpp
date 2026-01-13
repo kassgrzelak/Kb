@@ -8,16 +8,17 @@
 #include <cstdio>
 
 #include "debug.hpp"
+#include "compiler.hpp"
 
 VM::VM() noexcept
 {
 
 }
 
-InterpretResult VM::interpret(const Chunk* chunk)
+InterpretResult VM::interpret(const char *source)
 {
-	this->chunk = chunk;
-	return run();
+	compile(*this, source);
+	return INTERPRET_OK;
 }
 
 static size_t readByte24(const uint8_t* ip)
@@ -59,7 +60,7 @@ InterpretResult VM::run()
 			printf(" ]");
 		}
 		printf("\n");
-		switch (uint8_t instruction = READ_BYTE())
+		switch (READ_BYTE())
 		{
 			case OP_CONSTANT:
 			{
