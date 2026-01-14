@@ -123,8 +123,90 @@ static void skipWhitespace() {
 	}
 }
 
+static TokenType checkKeyword(const size_t start, const size_t length, const char* rest, const TokenType type)
+{
+	if (scanner.current - scanner.start == start + length &&
+		memcmp(scanner.start + start, rest, length) == 0)
+		return type;
+
+	return TOKEN_IDENTIFIER;
+}
+
 static TokenType identifierType()
 {
+	switch (scanner.start[0])
+	{
+		case 'a':
+			return checkKeyword(1, 2, "nd", TOKEN_AND);
+		case 'c':
+			return checkKeyword(1, 4, "lass", TOKEN_CLASS);
+		case 'd':
+			return checkKeyword(1, 2, "ec", TOKEN_DEC);
+		case 'e':
+			return checkKeyword(1, 3, "lse", TOKEN_ELSE);
+		case 'f':
+			if (scanner.current - scanner.start > 1)
+			{
+				switch (scanner.start[1])
+				{
+					case 'a':
+						return checkKeyword(2, 3, "lse", TOKEN_FALSE);
+					case 'o':
+						return checkKeyword(2, 1, "r", TOKEN_FOR);
+					case 'u':
+						return checkKeyword(2, 2, "nc", TOKEN_FUNC);
+				}
+			}
+			break;
+		case 'i':
+			if (scanner.current - scanner.start > 1)
+			{
+				switch (scanner.start[1])
+				{
+					case 'f':
+						return checkKeyword(2, 0, "", TOKEN_IF);
+					case 'n':
+						if (scanner.current - scanner.start > 2)
+						{
+							switch (scanner.start[2])
+							{
+								case 'c':
+									return checkKeyword(3, 0, "", TOKEN_INC);
+								case 'f':
+									return checkKeyword(3, 0, "", TOKEN_INF);
+							}
+						}
+						break;
+				}
+			}
+			break;
+		case 'o':
+			return checkKeyword(1, 1, "r", TOKEN_OR);
+		case 'p':
+			return checkKeyword(1, 4, "rint", TOKEN_PRINT);
+		case 'r':
+			return checkKeyword(1, 5, "eturn", TOKEN_RETURN);
+		case 's':
+			return checkKeyword(1, 4, "uper", TOKEN_SUPER);
+		case 't':
+			if (scanner.current - scanner.start > 1)
+			{
+				switch (scanner.start[1])
+				{
+					case 'h':
+						return checkKeyword(2, 2, "is", TOKEN_THIS);
+					case 'r':
+						return checkKeyword(2, 2, "ue", TOKEN_TRUE);
+				}
+			}
+			break;
+		case 'v':
+			return checkKeyword(1, 2, "ar", TOKEN_VAR);
+		case 'w':
+			return checkKeyword(1, 4, "hile", TOKEN_WHILE);
+		case 'z':
+			return checkKeyword(1, 4, "ilch", TOKEN_ZILCH);
+	}
 	return TOKEN_IDENTIFIER;
 }
 
