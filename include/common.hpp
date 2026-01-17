@@ -7,6 +7,7 @@
 
 #include <cstdint>
 
+#define DEBUG_PRINT_CODE // Disassemble chunks when they are made.
 #define DEBUG_TRACE_EXECUTION // Print every instruction just before it's executed.
 
 #endif //KFLAT_COMMON_HPP

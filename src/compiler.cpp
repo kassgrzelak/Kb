@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "debug.hpp"
 #include "Scanner.hpp"
 
 Compiler::Compiler(const char *source, Chunk &chunk) : scanner(source), chunk(chunk) { }
@@ -21,20 +22,77 @@ bool Compiler::compile()
 	return !parser.hadError;
 }
 
+const Compiler::ParseRule Compiler::rules[] = {
+    /* TOKEN_LEFT_PAREN */   { &Compiler::grouping, nullptr,              PREC_NONE },
+    /* TOKEN_RIGHT_PAREN */  { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_LEFT_BRACE */   { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_RIGHT_BRACE */  { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_COMMA */        { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_DOT */          { nullptr,             nullptr,              PREC_NONE },
+
+    /* TOKEN_INC */          { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_DEC */          { nullptr,             nullptr,              PREC_NONE },
+
+    /* TOKEN_MINUS */        { &Compiler::unary,    &Compiler::binary,    PREC_TERM },
+    /* TOKEN_PLUS */         { nullptr,             &Compiler::binary,    PREC_TERM },
+    /* TOKEN_SLASH */        { nullptr,             &Compiler::binary,    PREC_FACTOR },
+    /* TOKEN_STAR */         { nullptr,             &Compiler::binary,    PREC_FACTOR },
+    /* TOKEN_CARET */        { nullptr,             &Compiler::binary,    PREC_EXPONENT },
+
+    /* TOKEN_SEMICOLON */    { nullptr,             nullptr,              PREC_NONE },
+
+    /* TOKEN_BANG */         { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_BANG_EQUAL */   { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_EQUAL */        { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_EQUAL_EQUAL */  { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_GREATER */      { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_GREATER_EQUAL */{ nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_LESS */         { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_LESS_EQUAL */   { nullptr,             nullptr,              PREC_NONE },
+
+    /* TOKEN_IDENTIFIER */   { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_STRING */       { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_NUMBER */       { &Compiler::number,   nullptr,              PREC_NONE },
+
+    /* TOKEN_IF */           { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_ELSE */         { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_AND */          { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_OR */           { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_TRUE */         { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_FALSE */        { nullptr,             nullptr,              PREC_NONE },
+
+    /* TOKEN_CLASS */        { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_SUPER */        { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_THIS */         { nullptr,             nullptr,              PREC_NONE },
+
+    /* TOKEN_FOR */          { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_WHILE */        { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_FUNC */         { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_PRINT */        { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_RETURN */       { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_VAR */          { nullptr,             nullptr,              PREC_NONE },
+
+    /* TOKEN_ZILCH */        { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_INF */          { nullptr,             nullptr,              PREC_NONE },
+
+    /* TOKEN_ERROR */        { nullptr,             nullptr,              PREC_NONE },
+    /* TOKEN_EOF */          { nullptr,             nullptr,              PREC_NONE },
+};
+
 void Compiler::advance()
 {
 	parser.previous = parser.current;
 
 	for (;;)
 	{
-		parser.current = scanToken();
+		parser.current = scanner.scanToken();
 		if (parser.current.type != TOKEN_ERROR) break;
 
 		errorAtCurrent(parser.current.start);
 	}
 }
 
-void Compiler::consume(TokenType type, const char *message)
+void Compiler::consume(const TokenType type, const char *message)
 {
 	if (parser.current.type == type)
 	{
@@ -130,9 +188,9 @@ void Compiler::unary()
 
 void Compiler::binary()
 {
-	TokenType operatorType = parser.previous.type;
-	ParseRule* rule = getRule(operatorType);
-	parsePrecedence(static_cast<Precedence>(rule->precedence + 1));
+	const TokenType operatorType = parser.previous.type;
+	const auto rule = getRule(operatorType);
+	parsePrecedence(static_cast<Precedence>(rule.precedence + 1));
 
 	switch (operatorType)
 	{
@@ -140,17 +198,44 @@ void Compiler::binary()
 		case TOKEN_MINUS: emitByte(OP_SUBTRACT); break;
 		case TOKEN_STAR: emitByte(OP_MULTIPLY); break;
 		case TOKEN_SLASH: emitByte(OP_DIVIDE); break;
+		case TOKEN_CARET: emitByte(OP_EXPONENT); break;
 
 		default: return; // Unreachable.
 	}
 }
 
-void Compiler::parsePrecedence(Precedence prec)
+void Compiler::parsePrecedence(const Precedence precedence)
 {
+	advance();
+	const ParseFunc prefixRule = getRule(parser.previous.type).prefix;
 
+	if (prefixRule == nullptr)
+	{
+		error("Expect expression.");
+		return;
+	}
+
+	(this->*prefixRule)();
+
+	while (precedence <= getRule(parser.current.type).precedence)
+	{
+		advance();
+		const ParseFunc infixRule = getRule(parser.previous.type).infix;
+		(this->*infixRule)();
+	}
+}
+
+const Compiler::ParseRule& Compiler::getRule(const TokenType type)
+{
+	return rules[type];
 }
 
 void Compiler::endCompiler() const
 {
 	emitByte(OP_RETURN);
+
+#ifdef DEBUG_PRINT_CODE
+	if (!parser.hadError)
+		disassembleChunk(chunk, "code");
+#endif
 }

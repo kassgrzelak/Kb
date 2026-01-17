@@ -44,16 +44,16 @@ enum TokenType
 struct Token
 {
 	TokenType type;
-	const char* start{};
-	size_t length{};
-	size_t line{};
+	const char* start;
+	size_t length;
+	size_t line;
 };
 
 struct Scanner
 {
 	const char* start;
 	const char* current;
-	int line;
+	size_t line;
 
 	explicit Scanner(const char* source);
 
@@ -62,16 +62,16 @@ struct Scanner
 private:
 	static bool isAlpha(char c);
 	static bool isDigit(char c);
-	bool atEnd();
+	[[nodiscard]] bool atEnd() const;
 	char advance();
-	char peek();
-	char peekNext();
+	[[nodiscard]] char peek() const;
+	[[nodiscard]] char peekNext() const;
 	bool match(char expected);
-	Token makeToken(TokenType type);
-	Token errorToken(const char* message);
+	[[nodiscard]] Token makeToken(TokenType type) const;
+	[[nodiscard]] Token errorToken(const char* message) const;
 	void skipWhitespace();
-	TokenType checkKeyword(size_t start, size_t length, const char* rest, TokenType type);
-	TokenType identifierType();
+	TokenType checkKeyword(size_t start, size_t length, const char* rest, TokenType type) const;
+	TokenType identifierType() const;
 	Token identifier();
 	Token number();
 	Token string();

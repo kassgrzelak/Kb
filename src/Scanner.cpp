@@ -70,7 +70,7 @@ bool Scanner::isDigit(const char c)
 	return c >= '0' && c <= '9';
 }
 
-bool Scanner::atEnd()
+bool Scanner::atEnd() const
 {
 	return *current == '\0';
 }
@@ -81,12 +81,12 @@ char Scanner::advance()
 	return current[-1];
 }
 
-char Scanner::peek()
+char Scanner::peek() const
 {
 	return *current;
 }
 
-char Scanner::peekNext()
+char Scanner::peekNext() const
 {
 	if (atEnd()) return '\0';
 	return current[1];
@@ -105,24 +105,25 @@ bool Scanner::match(const char expected)
 }
 
 
-Token Scanner::makeToken(const TokenType type)
+Token Scanner::makeToken(const TokenType type) const
 {
-	Token token;
+	Token token{};
 
 	token.type = type;
 	token.start = start;
-	token.length = static_cast<size_t>(current - start);
+	token.length = current - start;
 	token.line = line;
 
 	return token;
 }
 
-Token Scanner::errorToken(const char* message) {
-	Token token;
+Token Scanner::errorToken(const char* message) const
+{
+	Token token{};
 
 	token.type = TOKEN_ERROR;
 	token.start = message;
-	token.length = static_cast<size_t>(strlen(message));
+	token.length = strlen(message);
 	token.line = line;
 
 	return token;
@@ -160,7 +161,7 @@ void Scanner::skipWhitespace() {
 	}
 }
 
-TokenType Scanner::checkKeyword(const size_t start, const size_t length, const char* rest, const TokenType type)
+TokenType Scanner::checkKeyword(const size_t start, const size_t length, const char* rest, const TokenType type) const
 {
 	if (current - this->start == start + length &&
 		memcmp(this->start + start, rest, length) == 0)
@@ -169,7 +170,7 @@ TokenType Scanner::checkKeyword(const size_t start, const size_t length, const c
 	return TOKEN_IDENTIFIER;
 }
 
-TokenType Scanner::identifierType()
+TokenType Scanner::identifierType() const
 {
 	switch (start[0])
 	{
