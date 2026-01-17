@@ -17,12 +17,10 @@ enum InterpretResult : uint8_t
 class VM
 {
 public:
-	VM() noexcept;
-
 	InterpretResult interpret(const char* source);
 
 private:
-	const Chunk* chunk = nullptr;
+	Chunk* chunk = nullptr;
 	std::vector<Value> stack;
 
 	InterpretResult run();

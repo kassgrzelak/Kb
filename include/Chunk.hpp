@@ -12,7 +12,7 @@
 
 enum OpCode : uint8_t
 {
-	OP_CONSTANT, OP_CONSTANT_24,
+	OP_CONSTANT_8, OP_CONSTANT_16, OP_CONSTANT_24, OP_CONSTANT_32,
 
 	OP_NEGATE,
 
@@ -33,7 +33,8 @@ struct Chunk
 
 	void write(OpCode op, size_t line) noexcept;
 	void write(uint8_t byte, size_t line) noexcept;
-	void writeConstant(Value value, size_t line) noexcept;
+	// Returns true if success, returns false if more than 2^32 constants in one chunk and therefore failure.
+	bool writeConstant(Value value, size_t line) noexcept;
 
 	size_t addConstant(Value value) noexcept;
 

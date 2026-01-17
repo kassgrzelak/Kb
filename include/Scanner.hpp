@@ -17,6 +17,7 @@ enum TokenType
 
 	TOKEN_MINUS, TOKEN_PLUS,
 	TOKEN_SLASH, TOKEN_STAR,
+	TOKEN_CARET,
 
 	TOKEN_SEMICOLON,
 
@@ -48,7 +49,33 @@ struct Token
 	size_t line{};
 };
 
-void initScanner(const char* source);
-Token scanToken();
+struct Scanner
+{
+	const char* start;
+	const char* current;
+	int line;
+
+	explicit Scanner(const char* source);
+
+	Token scanToken();
+
+private:
+	static bool isAlpha(char c);
+	static bool isDigit(char c);
+	bool atEnd();
+	char advance();
+	char peek();
+	char peekNext();
+	bool match(char expected);
+	Token makeToken(TokenType type);
+	Token errorToken(const char* message);
+	void skipWhitespace();
+	TokenType checkKeyword(size_t start, size_t length, const char* rest, TokenType type);
+	TokenType identifierType();
+	Token identifier();
+	Token number();
+	Token string();
+
+};
 
 #endif //KFLAT_SCANNER_HPP

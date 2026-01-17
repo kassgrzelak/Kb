@@ -34,6 +34,20 @@ static size_t constantInstruction(const char* name, const Chunk& chunk, const si
 	return offset + 2;
 }
 
+static size_t constantInstruction16(const char* name, const Chunk& chunk, const size_t offset)
+{
+	const uint8_t byte1 = chunk.code[offset + 1];
+	const uint8_t byte2 = chunk.code[offset + 2];
+
+	const size_t constantIndex = (byte1 << 8) | byte2;
+
+	printf("%-16s %4lu '", name, constantIndex);
+	printValue(chunk.constants[constantIndex]);
+	printf("'\n");
+
+	return offset + 3;
+}
+
 static size_t constantInstruction24(const char* name, const Chunk& chunk, const size_t offset)
 {
 	const uint8_t byte1 = chunk.code[offset + 1];
@@ -49,6 +63,22 @@ static size_t constantInstruction24(const char* name, const Chunk& chunk, const 
 	return offset + 4;
 }
 
+static size_t constantInstruction32(const char* name, const Chunk& chunk, const size_t offset)
+{
+	const uint8_t byte1 = chunk.code[offset + 1];
+	const uint8_t byte2 = chunk.code[offset + 2];
+	const uint8_t byte3 = chunk.code[offset + 3];
+	const uint8_t byte4 = chunk.code[offset + 4];
+
+	const size_t constantIndex = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
+
+	printf("%-16s %4lu '", name, constantIndex);
+	printValue(chunk.constants[constantIndex]);
+	printf("'\n");
+
+	return offset + 5;
+}
+
 size_t disassembleInstruction(const Chunk &chunk, const size_t offset)
 {
 	printf("0x%04x ", static_cast<unsigned int>(offset));
@@ -60,10 +90,14 @@ size_t disassembleInstruction(const Chunk &chunk, const size_t offset)
 
 	switch (const uint8_t instruction = chunk.code[offset])
 	{
-		case OP_CONSTANT:
-			return constantInstruction("OP_CONSTANT", chunk, offset);
+		case OP_CONSTANT_8:
+			return constantInstruction("OP_CONSTANT_8", chunk, offset);
+		case OP_CONSTANT_16:
+			return constantInstruction16("OP_CONSTANT_16", chunk, offset);
 		case OP_CONSTANT_24:
 			return constantInstruction24("OP_CONSTANT_24", chunk, offset);
+		case OP_CONSTANT_32:
+			return constantInstruction32("OP_CONSTANT_32", chunk, offset);
 
 		case OP_NEGATE:
 			return simpleInstruction("OP_NEGATE", offset);

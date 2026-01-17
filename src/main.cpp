@@ -63,7 +63,7 @@ static void runFile(VM& vm, const char* path)
 
 int main(const int argc, const char* argv[])
 {
-	VM vm{};
+	VM vm;
 
 	if (argc == 1)
 		repl(vm);

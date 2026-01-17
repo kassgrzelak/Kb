@@ -14,8 +14,8 @@ add_library(kflat_lib
         include/VM.hpp
         src/compiler.cpp
         include/compiler.hpp
-        src/scanner.cpp
-        include/scanner.hpp
+        src/Scanner.cpp
+        include/Scanner.hpp
 )
 
 target_include_directories(kflat_lib PUBLIC

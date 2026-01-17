@@ -4,6 +4,8 @@
 
 #include "../include/Chunk.hpp"
 
+#define UINT24_MAX 0xffffff
+
 size_t Chunk::size() const noexcept
 {
 	return code.size();
@@ -44,16 +46,26 @@ void Chunk::write(const uint8_t byte, const size_t line) noexcept
 	addLineData(line);
 }
 
-void Chunk::writeConstant(const Value value, const size_t line) noexcept
+bool Chunk::writeConstant(const Value value, const size_t line) noexcept
 {
 	const size_t constantIndex = addConstant(value);
 
 	if (constantIndex <= UINT8_MAX)
 	{
-		write(OP_CONSTANT, line);
+		write(OP_CONSTANT_8, line);
 		write(static_cast<uint8_t>(constantIndex), line);
 	}
-	else if (constantIndex <= 0xffffff)
+	else if (constantIndex <= UINT16_MAX)
+	{
+		write(OP_CONSTANT_16, line);
+
+		const uint8_t byte1 = constantIndex >> 8;
+		const uint8_t byte2 = constantIndex;
+
+		write(byte1, line);
+		write(byte2, line);
+	}
+	else if (constantIndex <= UINT24_MAX)
 	{
 		write(OP_CONSTANT_24, line);
 
@@ -65,10 +77,23 @@ void Chunk::writeConstant(const Value value, const size_t line) noexcept
 		write(byte2, line);
 		write(byte3, line);
 	}
-	else
+	else if (constantIndex <= UINT32_MAX)
 	{
-		// TODO: Error when exceeding the 24 bit constant index limit (somehow).
+		write(OP_CONSTANT_32, line);
+
+		const uint8_t byte1 = constantIndex >> 24;
+		const uint8_t byte2 = constantIndex >> 16;
+		const uint8_t byte3 = constantIndex >> 8;
+		const uint8_t byte4 = constantIndex;
+
+		write(byte1, line);
+		write(byte2, line);
+		write(byte3, line);
+		write(byte4, line);
 	}
+	else return false; // If you're using more than 2^32 constants in a chunk something is severely wrong with you.
+
+	return true;
 }
 
 size_t Chunk::addConstant(const Value value) noexcept
@@ -94,3 +119,5 @@ void Chunk::addLineData(const size_t line) noexcept
 		lineData.push_back(1);
 	}
 }
+
+#undef UINT24_MAX
